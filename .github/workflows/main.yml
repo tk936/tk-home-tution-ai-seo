@@ -1,0 +1,34 @@
+name: TK Home AI Daily SEO
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Roz subah 8:30 AM IST (approx)
+  workflow_dispatch: # Manual button ke liye
+
+jobs:
+  run-ai:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Requests
+        run: pip install requests
+
+      - name: Execute TK AI Engine
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/daily_engine.py
+
+      - name: Commit Dashboard Updates
+        run: |
+          git config --global user.name "TK-AI-Bot"
+          git config --global user.email "bot@tkhome.com"
+          git add DASHBOARD.md
+          git commit -m "Auto-SEO Update for $(date)"
+          git push
